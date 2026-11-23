@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Privacy Policy - FitMind AI</title>
+  <meta name="description" content="How FitMind AI handles your data. Our calculators run in your browser and progress data stays on your device.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header><div class="container"><div class="nav">
+  <a class="logo" href="index.html">Fit<span>Mind</span> AI</a>
+  <button id="menu-btn" aria-label="Open menu">&#9776;</button>
+  <nav id="menu"><a href="index.html">Home</a><a href="bmi-calculator.html">BMI</a><a href="calorie-calculator.html">Calories</a><a href="workout-planner.html">Workouts</a><a href="diet-planner.html">Diet</a><a href="progress-tracker.html">Progress</a><a href="guides.html">Guides</a></nav>
+</div></div></header>
+
+<main><section><div class="container">
+  <h1>Privacy Policy</h1>
+  <p>Last updated: November 23, 2026</p>
+  <div class="card">
+    <h2>Summary</h2>
+    <p>We try to collect as little data as possible. We do not have user accounts and we do not ask for your name, email or health records.</p>
+    <h2>Calculators and planners</h2>
+    <p>The BMI calculator, calorie calculator, workout planner and diet planner run inside your browser. The numbers you type are not sent to us.</p>
+    <h2>Progress tracker</h2>
+    <p>Weight entries are saved only in your browser's local storage on your device. We cannot see them. If you clear your browser data or switch devices, they can be lost. You can delete entries anytime inside the tracker.</p>
+    <h2>Hosting and logs</h2>
+    <p>This website is hosted on GitHub Pages. Like most hosts, GitHub may process technical information such as IP address and browser type when you visit. See GitHub's own privacy statement for details.</p>
+    <h2>Cookies</h2>
+    <p>We do not set our own tracking cookies at this time.</p>
+    <h2>AI features</h2>
+    <p>An AI assistant is not available yet. If we add one, it will send your typed messages to a third-party AI service to produce answers. We will update this policy first, and we will ask you not to enter personal health details.</p>
+    <h2>Advertising and affiliate links</h2>
+    <p>We do not show ads or affiliate links at this time. If we add them in the future, advertising partners may use cookies, and we will update this policy and explain your choices.</p>
+    <h2>Children</h2>
+    <p>This website is intended for adults. It is not directed to children under 13, and we do not knowingly collect information from them.</p>
+    <h2>Your choices</h2>
+    <p>You can clear your browser data at any time to remove anything stored on your device.</p>
+    <h2>Changes</h2>
+    <p>We may update this policy and will change the date above when we do.</p>
+    <h2>Contact</h2>
+    <p>Questions? Visit our <a href="contact.html">Contact page</a>.</p>
+  </div>
+</div></section></main>
+
+<footer><div class="container">
+  <p><a href="about.html">About</a> | <a href="contact.html">Contact</a> | <a href="privacy-policy.html">Privacy Policy</a> | <a href="medical-disclaimer.html">Medical Disclaimer</a></p>
+  <p>&copy; FitMind AI. General information only, not medical advice.</p>
+</div></footer>
+<script>document.getElementById('menu-btn').addEventListener('click',function(){document.getElementById('menu').classList.toggle('open');});</script>
+</body>
+</html>
