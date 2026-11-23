@@ -1,20 +1,96 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>FitMind AI</title>
-  <style>
-    body { margin:0; font-family:Arial,sans-serif; background:#0b1f3a; color:#fff;
-           display:flex; min-height:100vh; align-items:center; justify-content:center; text-align:center; }
-    h1 { color:#2ecc71; }
-  </style>
+  <title>FitMind AI - Your Smart Fitness &amp; Wellness Companion</title>
+  <meta name="description" content="Free fitness tools: BMI calculator, calorie calculator, workout and meal planning, and beginner-friendly fitness guides.">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <main>
-    <h1>FitMind AI</h1>
-    <p>Your Smart Fitness &amp; Wellness Companion</p>
-    <p>Coming soon.</p>
-  </main>
+<header>
+  <div class="container">
+    <div class="nav">
+      <a class="logo" href="index.html">Fit<span>Mind</span> AI</a>
+      <button id="menu-btn" aria-label="Open menu">&#9776;</button>
+      <nav id="menu">
+        <a href="index.html">Home</a>
+        <a href="bmi-calculator.html">BMI</a>
+        <a href="calorie-calculator.html">Calories</a>
+        <a href="workout-planner.html">Workouts</a>
+        <a href="diet-planner.html">Diet</a>
+        <a href="progress-tracker.html">Progress</a>
+        <a href="guides.html">Guides</a>
+      </nav>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="hero">
+    <div class="container">
+      <h1>Your Smart Fitness &amp; Wellness Companion</h1>
+      <p>Free, simple tools to understand your body, plan workouts, and build healthy habits.</p>
+      <a class="btn" href="bmi-calculator.html">Start with the BMI Calculator</a>
+    </div>
+  </div>
+
+  <section>
+    <div class="container">
+      <h2>Fitness Tools</h2>
+      <div class="grid">
+        <div class="card"><h3>BMI Calculator</h3><p>Check your Body Mass Index and learn what it does and does not tell you.</p><a href="bmi-calculator.html">Open tool</a></div>
+        <div class="card"><h3>Calorie Calculator</h3><p>Estimate your daily calorie needs using the Mifflin-St Jeor equation.</p><a href="calorie-calculator.html">Open tool</a></div>
+        <div class="card"><h3>Progress Tracker</h3><p>Log your weight and see your progress. Data stays in your own browser.</p><a href="progress-tracker.html">Open tool</a></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="container">
+      <h2>Beginner Workout (No Equipment)</h2>
+      <div class="card">
+        <p>Do this 3 days a week with a rest day between. Warm up for 5 minutes first.</p>
+        <ul>
+          <li>Bodyweight squats: 2 sets of 10</li>
+          <li>Wall or knee push-ups: 2 sets of 8</li>
+          <li>Glute bridges: 2 sets of 12</li>
+          <li>Plank: 2 holds of 20 seconds</li>
+        </ul>
+        <p>Rest 60 seconds between sets. Stop if you feel sharp pain.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="container">
+      <h2>Frequently Asked Questions</h2>
+      <div class="card"><h3>Is FitMind AI free?</h3><p>Yes, the tools are free to use.</p></div>
+      <br>
+      <div class="card"><h3>Is this medical advice?</h3><p>No. It is general information only. Talk to a doctor before starting a new exercise or diet plan.</p></div>
+      <br>
+      <div class="card"><h3>Is my data stored on a server?</h3><p>No. The progress tracker saves data only in your own browser.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="container">
+      <div class="disclaimer"><strong>Medical disclaimer:</strong> FitMind AI provides general fitness and wellness information, not medical advice. Consult a qualified professional before changing your exercise or eating habits.</div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="container">
+    <p>&copy; FitMind AI. General information only, not medical advice.</p>
+  </div>
+</footer>
+
+<script>
+  document.getElementById('menu-btn').addEventListener('click', function () {
+    document.getElementById('menu').classList.toggle('open');
+  });
+</script>
 </body>
 </html>
