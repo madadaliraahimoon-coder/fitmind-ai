@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Workout Planner - FitMind AI</title>
+  <meta name="description" content="Build a free weekly workout plan for your level, goal, equipment and time. Includes warm-up, cool-down, alternatives and safety tips.">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    label { display:block; font-weight:bold; margin:14px 0 6px; }
+    input[type=number], select { width:100%; padding:12px; font-size:1rem; border:2px solid #c9d3e0; border-radius:8px; }
+    input:focus, select:focus { outline:3px solid var(--green); }
+    .check { display:flex; gap:10px; align-items:flex-start; margin-top:16px; font-weight:normal; }
+    .check input { width:22px; height:22px; margin-top:3px; }
+    .hidden { display:none; }
+    .error { color:#b00020; font-weight:bold; margin-top:12px; }
+    .day { margin-bottom:16px; }
+    .ex { padding:10px 0; border-bottom:1px solid #dde5ef; }
+    .ex small { display:block; color:#4a5a70; }
+    .tag { display:inline-block; background:#eaf9f0; color:var(--navy); padding:2px 10px; border-radius:20px; font-size:.85rem; margin:2px 4px 2px 0; }
+  </style>
+</head>
+<body>
+<header>
+  <div class="container">
+    <div class="nav">
+      <a class="logo" href="index.html">Fit<span>Mind</span> AI</a>
+      <button id="menu-btn" aria-label="Open menu">&#9776;</button>
+      <nav id="menu">
+        <a href="index.html">Home</a>
+        <a href="bmi-calculator.html">BMI</a>
+        <a href="calorie-calculator.html">Calories</a>
+        <a href="workout-planner.html">Workouts</a>
+        <a href="diet-planner.html">Diet</a>
+        <a href="progress-tracker.html">Progress</a>
+        <a href="guides.html">Guides</a>
+      </nav>
+    </div>
+  </div>
+</header>
+
+<main>
+<section>
+  <div class="container">
+    <h1>Workout Planner</h1>
+    <p>Answer a few questions and get a simple weekly plan. This planner follows built-in rules in your browser. It is not an AI and it does not replace a coach or doctor.</p>
+
+    <div class="card">
+      <label for="age">Age (years)</label>
+      <input id="age" type="number" inputmode="numeric" placeholder="e.g. 25">
+
+      <label for="level">Fitness level</label>
+      <select id="level">
+        <option value="beginner">Beginner (new or returning)</option>
+        <option value="intermediate">Intermediate (training regularly for 6+ months)</option>
+        <option value="advanced">Advanced (training consistently for 2+ years)</option>
+      </select>
+
+      <label for="goal">Goal</label>
+      <select id="goal">
+        <option value="general">General fitness</option>
+        <option value="muscle">Build strength and muscle</option>
+        <option value="fatloss">Lose body fat (more activity)</option>
+        <option value="endurance">Improve stamina</option>
+      </select>
+
+      <label for="equip">Equipment</label>
+      <select id="equip">
+        <option value="none">No equipment (home)</option>
+        <option value="dumbbell">Dumbbells at home</option>
+        <option value="gym">Gym</option>
+      </select>
+
+      <label for="days">Training days per week</label>
+      <select id="days">
+        <option>2</option><option selected>3</option><option>4</option><option>5</option><option>6</option>
+      </select>
+
+      <label for="mins">Time per workout</label>
+      <select id="mins">
+        <option value="20">20 minutes</option>
+        <option value="30" selected>30 minutes</option>
+        <option value="45">45 minutes</option>
+        <option value="60">60 minutes</option>
+      </select>
+
+      <label class="check"><input id="clear" type="checkbox"> <span>I have no health condition that limits exercise, or my doctor has said exercise is safe for me.</span></label>
+
+      <p id="error" class="error" role="alert"></p>
+      <button class="btn" id="make" type="button">Create my plan</button>
+    </div>
+  </div>
+</section>
+
+<section id="out" class="hidden">
+  <div class="container">
+    <h2>Your Weekly Plan</h2>
+    <div id="summary" class="card"></div>
+    <h2>Warm-up (5 minutes, every session)</h2>
+    <div class="card"><ul>
+      <li>March in place: 1 minute</li>
+      <li>Arm circles and shoulder rolls: 1 minute</li>
+      <li>Hip circles and gentle torso twists: 1 minute</li>
+      <li>Slow bodyweight squats: 10 reps</li>
+      <li>Easy leg swings, 10 each side (hold a wall for balance)</li>
+    </ul></div>
+    <div id="days-out"></div>
+    <h2>Cool-down (5 minutes, every session)</h2>
+    <div class="card"><ul>
+      <li>Walk slowly for 2 minutes until your breathing settles</li>
+      <li>Stretch calves, thighs, hamstrings, chest and back: hold each 20 to 30 seconds</li>
+      <li>Stretch gently, with no bouncing and no sharp pain</li>
+    </ul></div>
+    <h2>Progress safely</h2>
+    <div class="card"><ul>
+      <li>Keep a log. When you can do the top of the rep range on every set with good form, make it slightly harder (a tougher variation, a bit more weight, or one more set).</li>
+      <li>Increase only one thing at a time and keep changes small.</li>
+      <li>Rest days matter: walk, stretch, and sleep well.</li>
+    </ul></div>
+    <h2>Safety instructions</h2>
+    <div class="disclaimer">
+      Stop right away and seek medical help if you feel chest pain, dizziness, unusual shortness of breath, or sharp pain. Use good form before adding difficulty. Warm up first. Stay hydrated. If an exercise hurts, use the alternative listed or skip it. This plan is general information, not medical advice.
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="container">
+    <p>&copy; FitMind AI. General information only, not medical advice.</p>
+  </div>
+</footer>
+
+<script>
+  document.getElementById('menu-btn').addEventListener('click', function () {
+    document.getElementById('menu').classList.toggle('open');
+  });
+
+  // Exercise library. Each item: [name, easier alternative, type]  (type: r = reps, t = timed hold, c = cardio)
+  var LIB = {
+    none: {
+      lower: [['Bodyweight squat','Sit down and stand up from a chair','r'],['Reverse lunge','Split squat holding a wall or chair','r'],['Glute bridge','Hip raise with a shorter range','r']],
+      push:  [['Push-up','Knee or wall push-up','r'],['Incline push-up (hands on a sturdy table or bench)','Wall push-up','r'],['Pike push-up','Incline pike with hands on a sturdy surface','r']],
+      pull:  [['Superman hold','Raise only arms or only legs','t'],['Reverse snow angels (lying face down)','Smaller arm range','r'],['Prone Y raise','Lift arms lower','r']],
+      core:  [['Plank','Knee plank','t'],['Dead bug','Smaller leg movement','r'],['Bird dog','Raise arm or leg only','r']],
+      cardio:[['Marching or brisk walking in place','Slow the pace','c'],['Step jacks (low impact jumping jacks)','Arms only','c'],['Fast walking or easy jogging outside','Walk only','c']]
+    },
+    dumbbell: {
+      lower: [['Goblet squat','Bodyweight squat','r'],['Dumbbell Romanian deadlift','Glute bridge','r'],['Dumbbell reverse lunge','Bodyweight lunge','r']],
+      push:  [['Dumbbell floor press','Push-up','r'],['Dumbbell shoulder press','Lighter weight, seated','r'],['Push-up','Knee push-up','r']],
+      pull:  [['One-arm dumbbell row','Lighter weight, supported on a bench','r'],['Bent-over dumbbell row','One arm at a time','r'],['Rear delt raise (light)','Use no weight','r']],
+      core:  [['Plank','Knee plank','t'],['Dead bug','Smaller leg movement','r'],['Farmer carry (walk holding dumbbells)','Lighter weights','t']],
+      cardio:[['Brisk walking or easy jogging','Walk only','c'],['Step-ups on a sturdy step','Lower step','c'],['Jumping jacks or step jacks','Step jacks','c']]
+    },
+    gym: {
+      lower: [['Leg press','Goblet squat','r'],['Romanian deadlift (dumbbell or barbell)','Glute bridge','r'],['Walking or reverse lunges','Split squat holding support','r']],
+      push:  [['Chest press machine','Push-up','r'],['Dumbbell shoulder press','Machine shoulder press','r'],['Incline dumbbell press','Chest press machine','r']],
+      pull:  [['Lat pulldown','Assisted pull-up machine','r'],['Seated cable row','One-arm dumbbell row','r'],['Face pull (light)','Rear delt raise','r']],
+      core:  [['Plank','Knee plank','t'],['Cable crunch or dead bug','Dead bug','r'],['Pallof press','Lighter resistance','r']],
+      cardio:[['Treadmill brisk walk or easy jog','Walk only','c'],['Stationary bike','Lower resistance','c'],['Rowing machine (easy pace)','Elliptical','c']]
+    }
+  };
+
+  var TEMPLATES = {
+    full:  ['lower','push','pull','core','lower','cardio'],
+    upper: ['push','pull','push','pull','core','core'],
+    lower: ['lower','lower','lower','core','cardio','core'],
+    cardio:['cardio','core','cardio','core','cardio','core']
+  };
+  var NAMES = { full:'Full body', upper:'Upper body', lower:'Lower body and core', cardio:'Cardio and core' };
+  var SCHEDULE = {
+    2:['full','full'], 3:['full','full','full'], 4:['upper','lower','upper','lower'],
+    5:['upper','lower','cardio','upper','lower'], 6:['upper','lower','cardio','upper','lower','cardio']
+  };
+  var COUNT = { 20:3, 30:4, 45:5, 60:6 };
+
+  var errorEl = document.getElementById('error');
+  function fail(msg) { errorEl.textContent = msg; document.getElementById('out').classList.add('hidden'); }
+
+  function h(tag, text, cls) {
+    var e = document.createElement(tag);
+    if (text) { e.textContent = text; }
+    if (cls) { e.className = cls; }
+    return e;
+  }
+
+  document.getElementById('make').addEventListener('click', function () {
+    errorEl.textContent = '';
+    var age = parseFloat(document.getElementById('age').value);
+    var level = document.getElementById('level').value;
+    var goal = document.getElementById('goal').value;
+    var equip = document.getElementById('equip').value;
+    var days = parseInt(document.getElementById('days').value, 10);
+    var mins = parseInt(document.getElementById('mins').value, 10);
+
+    if (isNaN(age) || age < 10 || age > 100) { return fail('Please enter a valid age.'); }
+    if (age < 18) { return fail('This planner is for adults (18+). Under 18, please ask a PE teacher, coach, or doctor for a safe program.'); }
+    if (!document.getElementById('clear').checked) { return fail('Please confirm the health statement first. If you are unsure, check with your doctor.'); }
+
+    // Sets, reps and rest from level and goal
+    var sets = level === 'beginner' ? 2 : level === 'intermediate' ? 3 : 4;
+    var reps = goal === 'muscle' ? '8 to 12' : goal === 'endurance' ? '15 to 20' : '10 to 15';
+    var rest = goal === 'muscle' && level !== 'beginner' ? '60 to 90 seconds' : '45 to 60 seconds';
+    var holdTime = level === 'beginner' ? '20 to 30 seconds' : '30 to 45 seconds';
+    var cardioTime = level === 'beginner' ? '10 to 15 minutes at an easy pace' : level === 'intermediate' ? '15 to 20 minutes at a steady pace' : '20 to 25 minutes (steady or with short harder intervals)';
+    var finisher = (goal === 'fatloss' || goal === 'endurance');
+
+    var lib = LIB[equip];
+    var plan = SCHEDULE[days];
+    var n = COUNT[mins];
+
+    // Summary
+    var sum = document.getElementById('summary');
+    sum.innerHTML = '';
+    sum.appendChild(h('span', days + ' days per week', 'tag'));
+    sum.appendChild(h('span', mins + ' min', 'tag'));
+    sum.appendChild(h('span', level, 'tag'));
+    sum.appendChild(h('p', 'On the other days, rest or take an easy walk. Leave at least one rest day between hard sessions for the same muscles.'));
+    if (age >= 60) { sum.appendChild(h('p', 'Because you are 60 or older, start lighter than you think you need, move slowly, and consider asking your doctor or a qualified trainer to check your plan.')); }
+
+    var out = document.getElementById('days-out');
+    out.innerHTML = '';
+
+    plan.forEach(function (type, di) {
+      var card = h('div', '', 'card day');
+      card.appendChild(h('h3', 'Day ' + (di + 1) + ': ' + NAMES[type]));
+      var used = {};
+      var items = [];
+      TEMPLATES[type].slice(0, n).forEach(function (cat) {
+        var list = lib[cat];
+        var c = used[cat] || 0;
+        if (c >= list.length) { return; }
+        used[cat] = c + 1;
+        items.push(list[(di + c) % list.length]);
+      });
+      if (finisher && type !== 'cardio') {
+        items.push(lib.cardio[di % lib.cardio.length]);
+      }
+      items.forEach(function (it) {
+        var row = h('div', '', 'ex');
+        var dose;
+        if (it[2] === 'r') { dose = sets + ' sets x ' + reps + ' reps, rest ' + rest; }
+        else if (it[2] === 't') { dose = sets + ' sets x ' + holdTime + ', rest ' + rest; }
+        else { dose = cardioTime; }
+        row.appendChild(h('strong', it[0]));
+        row.appendChild(h('small', dose));
+        row.appendChild(h('small', 'Easier option: ' + it[1]));
+        card.appendChild(row);
+      });
+      out.appendChild(card);
+    });
+
+    document.getElementById('out').classList.remove('hidden');
+    document.getElementById('out').scrollIntoView();
+  });
+</script>
+</body>
+  </html>
