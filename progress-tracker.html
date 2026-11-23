@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Progress Tracker - FitMind AI</title>
+  <meta name="description" content="Log your weight over time and see a simple chart. Your data stays in your own browser.">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    label { display:block; font-weight:bold; margin:14px 0 6px; }
+    input { width:100%; padding:12px; font-size:1rem; border:2px solid #c9d3e0; border-radius:8px; }
+    input:focus { outline:3px solid var(--green); }
+    .msg { margin-top:12px; font-weight:bold; }
+    .err { color:#b00020; }
+    .ok { color:#1a7f45; }
+    .btn2 { background:#e3e9f2; color:var(--navy); border:0; padding:14px 20px; border-radius:10px; font-size:1rem; margin-left:8px; }
+    .entry { display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid #dde5ef; gap:8px; }
+    .entry button { border:0; border-radius:8px; padding:8px 12px; font-size:.9rem; margin-left:6px; }
+    .edit { background:#e3e9f2; color:var(--navy); }
+    .del { background:#fdecea; color:#b00020; }
+    .chart-wrap { overflow-x:auto; }
+    svg { width:100%; height:auto; min-width:300px; }
+  </style>
+</head>
+<body>
+<header>
+  <div class="container">
+    <div class="nav">
+      <a class="logo" href="index.html">Fit<span>Mind</span> AI</a>
+      <button id="menu-btn" aria-label="Open menu">&#9776;</button>
+      <nav id="menu">
+        <a href="index.html">Home</a>
+        <a href="bmi-calculator.html">BMI</a>
+        <a href="calorie-calculator.html">Calories</a>
+        <a href="workout-planner.html">Workouts</a>
+        <a href="diet-planner.html">Diet</a>
+        <a href="progress-tracker.html">Progress</a>
+        <a href="guides.html">Guides</a>
+      </nav>
+    </div>
+  </div>
+</header>
+
+<main>
+<section>
+  <div class="container">
+    <h1>Progress Tracker</h1>
+    <p>Log your weight and watch the trend over time. Weekly or monthly entries are usually more useful than daily ones, because weight naturally changes from day to day.</p>
+    <div class="disclaimer"><strong>Privacy note:</strong> Your entries are saved only in this browser on this device. Nothing is sent to a server. If you clear your browser data or switch devices, your entries can be lost.</div>
+
+    <div class="card" style="margin-top:16px">
+      <label for="date">Date</label>
+      <input id="date" type="date">
+      <label for="kg">Weight (kg)</label>
+      <input id="kg" type="number" inputmode="decimal" step="0.1" placeholder="e.g. 65.5">
+      <p id="msg" class="msg" role="alert"></p>
+      <button class="btn" id="save" type="button">Add entry</button>
+      <button class="btn2" id="cancel" type="button" style="display:none">Cancel edit</button>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="container">
+    <h2>Your Chart</h2>
+    <div class="card chart-wrap" id="chart"></div>
+    <h2>Your Entries</h2>
+    <div class="card" id="list"></div>
+    <br>
+    <div class="disclaimer"><strong>Medical disclaimer:</strong> General information only, not medical advice. If you notice sudden or unexplained weight changes, please speak with a healthcare professional.</div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="container">
+    <p>&copy; FitMind AI. General information only, not medical advice.</p>
+  </div>
+</footer>
+
+<script>
+  document.getElementById('menu-btn').addEventListener('click', function () {
+    document.getElementById('menu').classList.toggle('open');
+  });
+
+  var KEY = 'fitmind_weights';
+  var entries = [];
+  var editingId = null;
+  var dateEl = document.getElementById('date');
+  var kgEl = document.getElementById('kg');
+  var msgEl = document.getElementById('msg');
+  var saveBtn = document.getElementById('save');
+  var cancelBtn = document.getElementById('cancel');
+
+  // Today's date in local time (YYYY-MM-DD)
+  function today() {
+    var d = new Date();
+    var m = String(d.getMonth() + 1).padStart(2, '0');
+    var day = String(d.getDate()).padStart(2, '0');
+    return d.getFullYear() + '-' + m + '-' + day;
+  }
+
+  function load() {
+    try {
+      var raw = localStorage.getItem(KEY);
+      entries = raw ? JSON.parse(raw) : [];
+      if (!Array.isArray(entries)) { entries = []; }
+    } catch (e) { entries = []; }
+  }
+
+  function persist() {
+    try { localStorage.setItem(KEY, JSON.stringify(entries)); return true; }
+    catch (e) { setMsg('Could not save. Your browser may be blocking storage (private mode).', true); return false; }
+  }
+
+  function setMsg(text, isErr) {
+    msgEl.textContent = text;
+    msgEl.className = 'msg ' + (isErr ? 'err' : 'ok');
+  }
+
+  function sorted() {
+    return entries.slice().sort(function (a, b) { return a.date < b.date ? -1 : a.date > b.date ? 1 : 0; });
+  }
+
+  function resetForm() {
+    editingId = null;
+    kgEl.value = '';
+    dateEl.value = today();
+    saveBtn.textContent = 'Add entry';
+    cancelBtn.style.display = 'none';
+  }
+
+  saveBtn.addEventListener('click', function () {
+    var date = dateEl.value;
+    var kg = parseFloat(kgEl.value);
+    if (!date) { return setMsg('Please choose a date.', true); }
+    if (date > today()) { return setMsg('The date cannot be in the future.', true); }
+    if (isNaN(kg) || kg < 20 || kg > 500) { return setMsg('Please enter a weight between 20 and 500 kg.', true); }
+    kg = Math.round(kg * 10) / 10;
+
+    if (editingId) {
+      entries.forEach(function (e) { if (e.id === editingId) { e.date = date; e.kg = kg; } });
+    } else {
+      entries.push({ id: String(Date.now()), date: date, kg: kg });
+    }
+    if (persist()) {
+      setMsg(editingId ? 'Entry updated.' : 'Entry saved.', false);
+      resetForm();
+      render();
+    }
+  });
+
+  cancelBtn.addEventListener('click', function () { resetForm(); setMsg('', false); });
+
+  function render() { renderList(); renderChart(); }
+
+  function renderList() {
+    var box = document.getElementById('list');
+    box.innerHTML = '';
+    var data = sorted().reverse();
+    if (data.length === 0) {
+      var p = document.createElement('p');
+      p.textContent = 'No entries yet. Add your first weight above.';
+      box.appendChild(p);
+      return;
+    }
+    data.forEach(function (e) {
+      var row = document.createElement('div'); row.className = 'entry';
+      var label = document.createElement('span');
+      label.textContent = e.date + ': ' + e.kg + ' kg';
+      var actions = document.createElement('span');
+      var ed = document.createElement('button'); ed.className = 'edit'; ed.textContent = 'Edit'; ed.type = 'button';
+      var dl = document.createElement('button'); dl.className = 'del'; dl.textContent = 'Delete'; dl.type = 'button';
+      ed.addEventListener('click', function () {
+        editingId = e.id; dateEl.value = e.date; kgEl.value = e.kg;
+        saveBtn.textContent = 'Update entry'; cancelBtn.style.display = 'inline-block';
+        setMsg('Editing an entry. Change it and tap Update entry.', false);
+        window.scrollTo(0, 0);
+      });
+      dl.addEventListener('click', function () {
+        if (confirm('Delete this entry?')) {
+          entries = entries.filter(function (x) { return x.id !== e.id; });
+          if (persist()) { setMsg('Entry deleted.', false); if (editingId === e.id) { resetForm(); } render(); }
+        }
+      });
+      actions.appendChild(ed); actions.appendChild(dl);
+      row.appendChild(label); row.appendChild(actions);
+      box.appendChild(row);
+    });
+  }
+
+  function renderChart() {
+    var box = document.getElementById('chart');
+    box.innerHTML = '';
+    var data = sorted();
+    if (data.length < 2) {
+      var p = document.createElement('p');
+      p.textContent = 'Add at least 2 entries to see your chart.';
+      box.appendChild(p);
+      return;
+    }
+    var NS = 'http://www.w3.org/2000/svg';
+    var W = 600, H = 260, L = 50, R = 20, T = 20, B = 40;
+    var svg = document.createElementNS(NS, 'svg');
+    svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+    svg.setAttribute('role', 'img');
+    svg.setAttribute('aria-label', 'Line chart of your weight over time');
+
+    var vals = data.map(function (e) { return e.kg; });
+    var min = Math.min.apply(null, vals), max = Math.max.apply(null, vals);
+    if (max - min < 1) { min -= 0.5; max += 0.5; }
+    var pad = (max - min) * 0.1; min -= pad; max += pad;
+
+    function x(i) { return L + (W - L - R) * i / (data.length - 1); }
+    function y(v) { return T + (H - T - B) * (1 - (v - min) / (max - min)); }
+    function el(name, attrs) {
+      var n = document.createElementNS(NS, name);
+      for (var k in attrs) { n.setAttribute(k, attrs[k]); }
+      return n;
+    }
+
+    // Axis lines and y labels
+    svg.appendChild(el('line', { x1: L, y1: T, x2: L, y2: H - B, stroke: '#c9d3e0' }));
+    svg.appendChild(el('line', { x1: L, y1: H - B, x2: W - R, y2: H - B, stroke: '#c9d3e0' }));
+    [min, (min + max) / 2, max].forEach(function (v) {
+      var t = el('text', { x: L - 6, y: y(v) + 4, 'text-anchor': 'end', 'font-size': '12', fill: '#445' });
+      t.textContent = v.toFixed(1);
+      svg.appendChild(t);
+    });
+
+    // Line and points
+    var pts = data.map(function (e, i) { return x(i) + ',' + y(e.kg); }).join(' ');
+    svg.appendChild(el('polyline', { points: pts, fill: 'none', stroke: '#2ecc71', 'stroke-width': '3' }));
+    data.forEach(function (e, i) {
+      svg.appendChild(el('circle', { cx: x(i), cy: y(e.kg), r: 4, fill: '#0b1f3a' }));
+    });
+
+    // First and last date labels
+    var t1 = el('text', { x: L, y: H - 12, 'font-size': '12', fill: '#445' }); t1.textContent = data[0].date;
+    var t2 = el('text', { x: W - R, y: H - 12, 'text-anchor': 'end', 'font-size': '12', fill: '#445' }); t2.textContent = data[data.length - 1].date;
+    svg.appendChild(t1); svg.appendChild(t2);
+    box.appendChild(svg);
+  }
+
+  dateEl.max = today();
+  dateEl.value = today();
+  load();
+  render();
+</script>
+</body>
+</html>
