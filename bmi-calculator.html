@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>BMI Calculator - FitMind AI</title>
+  <meta name="description" content="Free adult BMI calculator in cm/kg or feet/pounds, with category explanations and limitations.">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    label { display:block; font-weight:bold; margin:14px 0 6px; }
+    input, select { width:100%; padding:12px; font-size:1rem; border:2px solid #c9d3e0; border-radius:8px; }
+    input:focus, select:focus { outline:3px solid var(--green); }
+    .row { display:flex; gap:10px; }
+    .row > div { flex:1; }
+    .hidden { display:none; }
+    .error { color:#b00020; font-weight:bold; margin-top:12px; }
+    #result { margin-top:20px; padding:18px; border-radius:12px; background:#eaf9f0; border-left:6px solid var(--green); }
+    #result .big { font-size:2.2rem; font-weight:bold; color:var(--navy); }
+    table { width:100%; border-collapse:collapse; }
+    td, th { text-align:left; padding:8px; border-bottom:1px solid #dde5ef; }
+  </style>
+</head>
+<body>
+<header>
+  <div class="container">
+    <div class="nav">
+      <a class="logo" href="index.html">Fit<span>Mind</span> AI</a>
+      <button id="menu-btn" aria-label="Open menu">&#9776;</button>
+      <nav id="menu">
+        <a href="index.html">Home</a>
+        <a href="bmi-calculator.html">BMI</a>
+        <a href="calorie-calculator.html">Calories</a>
+        <a href="workout-planner.html">Workouts</a>
+        <a href="diet-planner.html">Diet</a>
+        <a href="progress-tracker.html">Progress</a>
+        <a href="guides.html">Guides</a>
+      </nav>
+    </div>
+  </div>
+</header>
+
+<main>
+<section>
+  <div class="container">
+    <h1>BMI Calculator (Adults)</h1>
+    <p>Body Mass Index (BMI) compares your weight with your height. It is a quick screening number, not a diagnosis.</p>
+
+    <div class="card">
+      <label for="age">Age (years)</label>
+      <input id="age" type="number" inputmode="numeric" min="2" max="120" placeholder="e.g. 25">
+
+      <label for="hUnit">Height unit</label>
+      <select id="hUnit">
+        <option value="cm">Centimetres (cm)</option>
+        <option value="ftin">Feet and inches</option>
+      </select>
+
+      <div id="hCm">
+        <label for="cm">Height (cm)</label>
+        <input id="cm" type="number" inputmode="decimal" placeholder="e.g. 170">
+      </div>
+      <div id="hFt" class="hidden">
+        <div class="row">
+          <div><label for="ft">Feet</label><input id="ft" type="number" inputmode="numeric" placeholder="e.g. 5"></div>
+          <div><label for="inch">Inches</label><input id="inch" type="number" inputmode="decimal" placeholder="e.g. 7"></div>
+        </div>
+      </div>
+
+      <label for="wUnit">Weight unit</label>
+      <select id="wUnit">
+        <option value="kg">Kilograms (kg)</option>
+        <option value="lb">Pounds (lb)</option>
+      </select>
+
+      <label for="wt">Weight</label>
+      <input id="wt" type="number" inputmode="decimal" placeholder="e.g. 65">
+
+      <p id="error" class="error" role="alert"></p>
+      <button class="btn" id="calc" type="button">Calculate BMI</button>
+      <div id="result" class="hidden" aria-live="polite"></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="container">
+    <h2>Adult BMI Categories</h2>
+    <div class="card">
+      <table>
+        <tr><th>BMI</th><th>Category</th></tr>
+        <tr><td>Below 18.5</td><td>Underweight</td></tr>
+        <tr><td>18.5 to 24.9</td><td>Healthy weight range</td></tr>
+        <tr><td>25.0 to 29.9</td><td>Overweight</td></tr>
+        <tr><td>30.0 and above</td><td>Obesity range</td></tr>
+      </table>
+    </div>
+    <h2>Limitations of BMI</h2>
+    <div class="card">
+      <ul>
+        <li>BMI does not measure body fat. Muscular people may have a high BMI without excess fat.</li>
+        <li>It does not show where fat is stored, and it can be less accurate for older adults and some ethnic groups.</li>
+        <li>These categories are for adults only. Children and teens need age-and-sex-specific growth charts from a doctor.</li>
+        <li>BMI is not a diagnosis. Talk to a healthcare professional about your health.</li>
+      </ul>
+    </div>
+    <br>
+    <div class="disclaimer"><strong>Medical disclaimer:</strong> This tool gives general information only and is not medical advice.</div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="container">
+    <p>&copy; FitMind AI. General information only, not medical advice.</p>
+  </div>
+</footer>
+
+<script>
+  // Menu button
+  document.getElementById('menu-btn').addEventListener('click', function () {
+    document.getElementById('menu').classList.toggle('open');
+  });
+
+  var hUnit = document.getElementById('hUnit');
+  var errorEl = document.getElementById('error');
+  var resultEl = document.getElementById('result');
+
+  // Switch between cm and feet/inches inputs
+  hUnit.addEventListener('change', function () {
+    var isCm = hUnit.value === 'cm';
+    document.getElementById('hCm').classList.toggle('hidden', !isCm);
+    document.getElementById('hFt').classList.toggle('hidden', isCm);
+  });
+
+  function showError(msg) {
+    errorEl.textContent = msg;
+    resultEl.classList.add('hidden');
+  }
+
+  document.getElementById('calc').addEventListener('click', function () {
+    errorEl.textContent = '';
+
+    // Age check
+    var age = parseFloat(document.getElementById('age').value);
+    if (isNaN(age) || age < 2 || age > 120) { return showError('Please enter a valid age (2 to 120).'); }
+
+    // Height in metres
+    var heightM;
+    if (hUnit.value === 'cm') {
+      var cm = parseFloat(document.getElementById('cm').value);
+      if (isNaN(cm) || cm < 50 || cm > 272) { return showError('Please enter a height between 50 and 272 cm.'); }
+      heightM = cm / 100;
+    } else {
+      var ft = parseFloat(document.getElementById('ft').value);
+      var inch = parseFloat(document.getElementById('inch').value || '0');
+      if (isNaN(ft) || ft < 1 || ft > 8 || isNaN(inch) || inch < 0 || inch >= 12) {
+        return showError('Please enter feet (1 to 8) and inches (0 to 11.9).');
+      }
+      heightM = (ft * 12 + inch) * 0.0254;
+    }
+
+    // Weight in kg
+    var w = parseFloat(document.getElementById('wt').value);
+    var wUnit = document.getElementById('wUnit').value;
+    var kg = wUnit === 'kg' ? w : w * 0.45359237;
+    if (isNaN(w) || kg < 10 || kg > 500) { return showError('Please enter a realistic weight.'); }
+
+    var bmi = kg / (heightM * heightM);
+    var bmiText = bmi.toFixed(1);
+
+    // Children and teens: do not apply adult categories
+    if (age < 18) {
+      resultEl.innerHTML = '';
+      var big0 = document.createElement('div'); big0.className = 'big'; big0.textContent = 'BMI: ' + bmiText;
+      var p0 = document.createElement('p');
+      p0.textContent = 'Adult BMI categories do not apply under age 18. Children and teens should be assessed with growth charts by a doctor or nurse.';
+      resultEl.appendChild(big0); resultEl.appendChild(p0);
+      resultEl.classList.remove('hidden');
+      return;
+    }
+
+    var category;
+    if (bmi < 18.5) { category = 'Underweight'; }
+    else if (bmi < 25) { category = 'Healthy weight range'; }
+    else if (bmi < 30) { category = 'Overweight'; }
+    else { category = 'Obesity range'; }
+
+    resultEl.innerHTML = '';
+    var big = document.createElement('div'); big.className = 'big'; big.textContent = 'BMI: ' + bmiText;
+    var p = document.createElement('p'); p.textContent = 'Category: ' + category;
+    var note = document.createElement('p');
+    note.textContent = 'This is a screening estimate only. It does not measure body fat or overall health. If you are worried about your weight, speak with a healthcare professional.';
+    resultEl.appendChild(big); resultEl.appendChild(p); resultEl.appendChild(note);
+    resultEl.classList.remove('hidden');
+  });
+</script>
+</body>
+</html>
