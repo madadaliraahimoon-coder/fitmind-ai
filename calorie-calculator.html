@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>BMR and Calorie Calculator - FitMind AI</title>
+  <meta name="description" content="Estimate your BMR and daily maintenance calories with the Mifflin-St Jeor equation. Estimates only, not medical advice.">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    label { display:block; font-weight:bold; margin:14px 0 6px; }
+    input, select { width:100%; padding:12px; font-size:1rem; border:2px solid #c9d3e0; border-radius:8px; }
+    input:focus, select:focus { outline:3px solid var(--green); }
+    .hidden { display:none; }
+    .error { color:#b00020; font-weight:bold; margin-top:12px; }
+    #result { margin-top:20px; padding:18px; border-radius:12px; background:#eaf9f0; border-left:6px solid var(--green); }
+    #result .big { font-size:1.8rem; font-weight:bold; color:var(--navy); }
+    table { width:100%; border-collapse:collapse; }
+    td, th { text-align:left; padding:8px; border-bottom:1px solid #dde5ef; }
+  </style>
+</head>
+<body>
+<header>
+  <div class="container">
+    <div class="nav">
+      <a class="logo" href="index.html">Fit<span>Mind</span> AI</a>
+      <button id="menu-btn" aria-label="Open menu">&#9776;</button>
+      <nav id="menu">
+        <a href="index.html">Home</a>
+        <a href="bmi-calculator.html">BMI</a>
+        <a href="calorie-calculator.html">Calories</a>
+        <a href="workout-planner.html">Workouts</a>
+        <a href="diet-planner.html">Diet</a>
+        <a href="progress-tracker.html">Progress</a>
+        <a href="guides.html">Guides</a>
+      </nav>
+    </div>
+  </div>
+</header>
+
+<main>
+<section>
+  <div class="container">
+    <h1>BMR &amp; Calorie Calculator</h1>
+    <p>Estimate how many calories your body uses in a day. These are estimates, not exact medical requirements.</p>
+
+    <div class="disclaimer"><strong>Not for everyone:</strong> This tool is for healthy adults (18+). It is not suitable for people under 18, pregnant or breastfeeding women, people with medical conditions, or anyone with a history of eating disorders. Please ask a doctor or registered dietitian instead.</div>
+
+    <div class="card" style="margin-top:16px">
+      <label for="age">Age (years, 18 or older)</label>
+      <input id="age" type="number" inputmode="numeric" placeholder="e.g. 25">
+
+      <label for="sex">Sex (used by the formula)</label>
+      <select id="sex">
+        <option value="male">Male</option>
+        <option value="female">Female</option>
+      </select>
+
+      <label for="cm">Height (cm)</label>
+      <input id="cm" type="number" inputmode="decimal" placeholder="e.g. 170">
+
+      <label for="kg">Weight (kg)</label>
+      <input id="kg" type="number" inputmode="decimal" placeholder="e.g. 65">
+
+      <label for="act">Activity level</label>
+      <select id="act">
+        <option value="1.2">Sedentary: little or no exercise</option>
+        <option value="1.375">Light: exercise 1 to 3 days a week</option>
+        <option value="1.55" selected>Moderate: exercise 3 to 5 days a week</option>
+        <option value="1.725">Very active: hard exercise 6 to 7 days a week</option>
+        <option value="1.9">Extra active: very hard exercise or physical job</option>
+      </select>
+
+      <p id="error" class="error" role="alert"></p>
+      <button class="btn" id="calc" type="button">Calculate</button>
+      <div id="result" class="hidden" aria-live="polite"></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="container">
+    <h2>How this is calculated</h2>
+    <div class="card">
+      <p><strong>BMR</strong> (basal metabolic rate) is the energy your body uses at rest. We use the Mifflin-St Jeor equation:</p>
+      <ul>
+        <li>Men: BMR = 10 x weight (kg) + 6.25 x height (cm) - 5 x age + 5</li>
+        <li>Women: BMR = 10 x weight (kg) + 6.25 x height (cm) - 5 x age - 161</li>
+      </ul>
+      <p><strong>Maintenance calories</strong> = BMR x an activity multiplier (1.2, 1.375, 1.55, 1.725 or 1.9).</p>
+      <p>Real needs vary by person because of muscle mass, genetics, health, and daily movement. Treat the result as a starting point and watch how your body responds over several weeks.</p>
+    </div>
+    <br>
+    <div class="disclaimer"><strong>Medical disclaimer:</strong> General information only, not medical advice. Do not use calorie estimates to justify extreme dieting. If you struggle with food or body image, please talk to a healthcare professional.</div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="container">
+    <p>&copy; FitMind AI. General information only, not medical advice.</p>
+  </div>
+</footer>
+
+<script>
+  document.getElementById('menu-btn').addEventListener('click', function () {
+    document.getElementById('menu').classList.toggle('open');
+  });
+
+  var errorEl = document.getElementById('error');
+  var resultEl = document.getElementById('result');
+
+  function showError(msg) {
+    errorEl.textContent = msg;
+    resultEl.classList.add('hidden');
+  }
+
+  document.getElementById('calc').addEventListener('click', function () {
+    errorEl.textContent = '';
+    var age = parseFloat(document.getElementById('age').value);
+    var cm = parseFloat(document.getElementById('cm').value);
+    var kg = parseFloat(document.getElementById('kg').value);
+    var sex = document.getElementById('sex').value;
+    var mult = parseFloat(document.getElementById('act').value);
+
+    if (isNaN(age) || age < 1 || age > 120) { return showError('Please enter a valid age.'); }
+    if (age < 18) { return showError('This calculator is for adults (18+). Under 18, please ask a doctor or nurse about healthy growth and nutrition.'); }
+    if (isNaN(cm) || cm < 100 || cm > 250) { return showError('Please enter a height between 100 and 250 cm.'); }
+    if (isNaN(kg) || kg < 30 || kg > 300) { return showError('Please enter a weight between 30 and 300 kg.'); }
+
+    // Mifflin-St Jeor equation
+    var bmr = 10 * kg + 6.25 * cm - 5 * age + (sex === 'male' ? 5 : -161);
+    var maintenance = bmr * mult;
+
+    resultEl.innerHTML = '';
+    function add(tag, text, cls) {
+      var el = document.createElement(tag);
+      el.textContent = text;
+      if (cls) { el.className = cls; }
+      resultEl.appendChild(el);
+    }
+    add('div', 'BMR: ' + Math.round(bmr) + ' kcal/day', 'big');
+    add('div', 'Maintenance: about ' + Math.round(maintenance) + ' kcal/day', 'big');
+    add('p', 'Assumptions: Mifflin-St Jeor equation, activity multiplier ' + mult + '.');
+    add('p', 'This is an estimate, not an exact requirement. Your real needs can be higher or lower. Do not eat far below your BMR without medical supervision.');
+    resultEl.classList.remove('hidden');
+  });
+</script>
+</body>
+</html>
